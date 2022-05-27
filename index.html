@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Stlite App</title>
+</head>
+<body>
+  <script src="https://whitphx.github.io/stlite/lib/application/stlite.js" ></script>
+  <script>
+    stlite.mount({
+      mainScriptData: `
+import streamlit as st
+import os
+import runpy
+
+
+class stwidget:
+  def __init__(self,kind,sidebar,name):
+    self.kind = kind
+    self.sidebar = sidebar
+    self.name = name
+  def get_code(self):
+    if self.sidebar==True:
+      code = f"st.sidebar.{self.kind}('{self.name}')"
+    else:
+      code = f"st.{self.kind}('{self.name}')"
+
+
+    return code
+
+st.set_page_config(page_title="Streamlit App", page_icon="🤖",layout="wide")
+widgets = ['title','header','subheader','image','text','button','checkbox','slider','text_input','number_input','camera_input']
+col1,col2 = st.columns([6,2])
+select_widget=col2.selectbox('select',widgets)
+if 'code_list' not in st.session_state:
+    st.session_state.code_list = []
+with col2.form('form'):
+    is_sidebar = st.checkbox('sidebar')
+    label = st.text_input('label or text')
+    wid = stwidget(select_widget,is_sidebar,label)   
+    subm= st.form_submit_button('submit')
+    if subm:        
+        st.session_state.code_list.append(wid.get_code())
+for code in st.session_state.code_list:
+  with col1:
+    exec(code)
+`
+    })
+  </script>
+</body>
+</html>
